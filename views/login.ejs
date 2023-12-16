@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dongguk 로그인</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+
+        body {
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: linear-gradient(to right, #6dd5ed, #2193b0);
+        }
+
+
+        .login-container {
+            background: #fff;
+            padding: 40px;
+            width: 100%;
+            max-width: 350px;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+
+        h1 {
+            font-family: 'Noto Sans KR', sans-serif;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .input-space input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .input-space input:focus {
+            border-color: #2193b0;
+            outline: none;
+        }
+
+
+        button {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 10px;
+            border: none;
+            background: #2193b0;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #6dd5ed;
+        }
+
+
+        p {
+            text-align: center;
+            color: #666;
+        }
+
+        .captcha-text {
+            margin-top: 20px;
+            color: #888;
+            font-size: 0.8rem;
+        }
+
+        @media (min-width: 768px) {
+            .login-container { max-width: 400px; }
+            h1 { font-size: 2.5rem; }
+            .input-space input { margin-bottom: 20px; }
+            button { width: calc(100%); padding: 20px; margin-bottom: 15px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>Dongguk.KR</h1>
+        <form method = 'post' action ='/login'>
+            <div class="input-space">
+                <input name="id" type="text" placeholder="아이디" autocomplete="username">
+                <input name="password" type="password" placeholder="비밀번호" autocomplete="current-password">
+            </div>
+            <button type = 'button' onclick="checkLOLID()" >로그인</button>
+        </form>
+            <p class="captcha-text">University Rank Communication</p>
+            <div class="login-footer">
+                <p>계정이 없으신가요? <a href = '/register' method = 'post'>지금 가입하기</a></form></p>
+            
+        </div>
+    </div>
+    <script>
+        async function checkLOLID() {
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        id: document.querySelector('input[name="id"]').value,
+                        password: document.querySelector('input[name="password"]').value,
+                    }),
+                });
+    
+                if (response.ok) {
+                    console.log('오류');
+                    window.location.href = '/home'; // 로그인 성공 시 리디렉션
+                } else if (response.status === 400) {
+                    alert('비밀번호 틀리셨습니다. 다시 입력해주세요.');
+                } else if (response.status === 401) {
+                    alert('없는 계정입니다');
+                } else {
+                    throw new Error('알 수 없는 오류가 발생했습니다.');
+                }
+            } catch (err) {
+                alert('오류가 발생했습니다: ' + err.message);
+            }
+        }
+    </script>
+    
+</body>
+</html>

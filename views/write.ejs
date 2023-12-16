@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시글 작성</title>
+    <style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 20px;
+}
+
+
+.board_wrap {
+    background-color: #fff;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.board_title strong {
+    display: block;
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+}
+
+
+.board_write {
+    display: flex;
+    flex-direction: column;
+}
+
+.write_row {
+    margin-bottom: 15px;
+}
+
+.write_row label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+
+
+input[type="text"],
+textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+textarea {
+    height: 100px;
+    resize: vertical;
+}
+
+
+.bt_wrap {
+    text-align: right;
+}
+
+.bt_wrap button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.bt_wrap button:hover {
+    background-color: #0056b3;
+}
+
+.bt_wrap button.on {
+    background-color: #28a745;
+}
+html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Noto Sans KR', Arial, sans-serif;
+            background-color: #e9ecef;
+        }
+
+        header {
+            background-color: #343a40;
+            color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: flex-start; 
+            align-items: center;
+            padding: 0 1rem;
+            margin: 0;
+        }
+
+
+        nav li:not(:last-child) {
+            margin-right: 10px;
+        }
+
+        .user-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: auto; 
+        }
+
+        nav button, .search-container button {
+            background-color: #007bff;
+            border: none;
+            padding: 0.5rem 1rem;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        nav button:hover, .search-container button:hover {
+            background-color: #0056b3;
+        }
+
+        .search-container {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-container input[type="text"] {
+            padding: 8px;
+            font-size: 16px;
+            border: 2px solid #007bff;
+            border-radius: 5px;
+            width: 300px;
+        }
+
+        @media (max-width: 768px) {
+            .search-container, .user-controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .search-container input[type="text"],
+            .search-container button {
+                width: 100%;
+            }
+
+            nav ul {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href='/home'><button id="boardBtn">홈</button></a></li>
+                <li><a href='/list'><button id="boardBtn">게시판</button></a></li>
+                <li><a href='/chat'><button id="boardBtn">채팅방</button></a></li>
+                <li><a href='/getMessageList'><button id="boardBtn">쪽지함</button></a></li>
+                <!-- 검색 컨테이너 -->
+                <li class="search-container">
+                    <form action = /getMatchRecord method = 'post'>
+                        <input type="text" name="lolname" id="searchInput" class="search-input" placeholder="소환사명, 소환사명...">
+                        <button id="searchBtn" class="search-button"sjrk >검색</button>
+                        </form>
+                </li>
+                
+                <!-- 사용자 컨트롤 -->
+                <li class="user-controls">
+                    <span id="userGreeting"><%= userInfo%> 님 환영합니다.</span>
+                    <form action='/logout' method='get'>
+                        <button id="logoutBtn">로그아웃</button>
+                    </form>
+                </li>
+            </ul>
+        </nav>
+    </header>
+    <div class="board_wrap">
+        <div class="board_title">
+            <strong>게시글 작성</strong>
+        </div>
+        <form id="postForm" class="board_write">
+            <div class="write_row">
+                <label for="title">제목</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+            <div class="write_row">
+                <label for="writer">작성자:<%= lol%></label>
+                <input type="text" id="writer" name="writer" value="<%= lol%>" style="display:none;">
+            </div>
+            <div class="write_row">
+                <label for="content">내용</label>
+                <textarea id="content" name="content" required></textarea>
+            </div>
+            <div class="bt_wrap">
+                <button type="submit" class="on">글쓰기</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('postForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = {
+                title: document.getElementById('title').value,
+                writer: document.getElementById('writer').value,
+                content: document.getElementById('content').value,
+                date: new Date().toISOString().slice(0, 10),
+                 
+            };
+
+            fetch('/write', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('게시글이 등록되었습니다.');
+                location.href='/list';
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>

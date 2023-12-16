@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>소환사 정보</title>
+    <style>
+       html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Noto Sans KR', Arial, sans-serif;
+            background-color: #e9ecef;
+        }
+
+        header {
+            background-color: #343a40;
+            color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: flex-start; 
+            align-items: center;
+            padding: 0 1rem;
+            margin: 0;
+        }
+
+  
+        nav li:not(:last-child) {
+            margin-right: 10px;
+        }
+
+        .user-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: auto; 
+        }
+
+        /* 버튼 및 입력 필드 스타일 */
+        nav button, .search-container button {
+            background-color: #007bff;
+            border: none;
+            padding: 0.5rem 1rem;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        nav button:hover, .search-container button:hover {
+            background-color: #0056b3;
+        }
+
+        .search-container {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-container input[type="text"] {
+            padding: 8px;
+            font-size: 16px;
+            border: 2px solid #007bff;
+            border-radius: 5px;
+            width: 300px;
+        }
+        
+
+
+        @media (max-width: 768px) {
+            .search-container, .user-controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .search-container input[type="text"],
+            .search-container button {
+                width: 100%;
+            }
+
+            nav ul {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+        .user-info {
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 20px;
+    margin-top: 80px;
+    border-radius: 8px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.user-info h1 {
+    color: #343a40;
+    margin-bottom: 15px;
+}
+
+.user-info ul {
+    list-style: none;
+    padding: 0;
+}
+
+.user-info ul li {
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.user-info img {
+    max-width: 100px;
+    height: auto;
+    border-radius: 50%;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    text-align: left;
+    padding: 8px;
+}
+
+th {
+    background-color: #343a40;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+tr:hover {
+    background-color: #ddd;
+}
+
+.win {
+    color: green;
+}
+
+.loss {
+    color: red;
+}
+.profile-container {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.profile-icon {
+    max-width: 100px;
+    height: auto;
+    border-radius: 50%;
+}
+
+.profile-details {
+    display: flex;
+    flex-direction: column;
+}
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href='/home'><button id="boardBtn">홈</button></a></li>
+                <li><a href='/list'><button id="boardBtn">게시판</button></a></li>
+                <li><a href='/chat'><button id="boardBtn">채팅방</button></a></li>
+                <li><a href='/getMessageList'><button id="boardBtn">쪽지함</button></a></li>
+                <li class="search-container">
+                    <form action = /getMatchRecord method = 'post'>
+                        <input type="text" name="lolname" id="searchInput" class="search-input" placeholder="소환사명, 소환사명...">
+                        <button id="searchBtn"  >검색</button>
+                </form>
+                </li>
+                <li class="user-controls">
+                    <span id="userGreeting"><%= data.userId%> 님 환영합니다.</span>
+                    <form action='/logout' method='get'>
+                        <button id="logoutBtn">로그아웃</button>
+                    </form>
+                </li>
+            </ul>
+        </nav>
+    </header>
+    <div class="user-info">
+        
+        <% if (data.profile && data.profile.length > 0) { %>
+            <h1>소환사 정보</h1>
+            <div class="profile-container">
+                <img src="<%= data.profile[0].userIcon %>" alt="사용자 아이콘" class="profile-icon">
+                <div class="profile-details">
+                    <div>롤 닉네임: <%= data.profile[0].LOLname %></div>
+                    <div>티어: <%= data.profile[0].Tier %></div>
+                    <div>승리: <%= data.profile[0].Wins %></div>
+                    <div>패배: <%= data.profile[0].Losses %></div>
+                    <div>승률: <%= data.profile[0].WinRate %>%</div>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>게임 모드</th>
+                        <th>챔피언</th>
+                        <th>승리 여부</th>
+                        <th>Kills</th>
+                        <th>Deaths</th>
+                        <th>Assists</th>
+                        <th>게임 시작 시간</th>
+                        <th>게임 시간</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <% for (let i = 0; i < data.matches.gameMode.length; i++) { %>
+                    <tr>
+                        <td><%= data.matches.gameMode[i].replace("ARAM", "칼바람").replace("CLASSIC", "일반").replace("RANK", "랭크전") %></td>
+                        <td><img src="<%= data.matches.Championurl[i] %>" alt="<%= data.matches.championName[i] %> 아이콘" style="max-width: 50px; height: auto;"></td>
+                        <td class="<%= data.matches.win[i] ? 'win' : 'loss' %>"><%= data.matches.win[i] ? '승리' : '패배' %></td>
+                        <td><%= data.matches.kills[i] %></td>
+                        <td><%= data.matches.deaths[i] %></td>
+                        <td><%= data.matches.assists[i] %></td>
+                        <td><%= data.matches.gameStartTimestamp[i] %></td>
+                        <td><%= (data.matches.gameDuration[i]).toFixed()  %> 분</td>
+                    </tr>
+                    <% } %>
+                    </tbody>
+                </table>
+            </div>
+        <% } else { %>
+            <h1>해당 소환사 정보가 없습니다.</h1>
+        <% } %>
+    </div>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>사용자 매치 기록</title>
+    <style>
+        /* 여기에 필요한 CSS 스타일 추가 */
+        .match {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>사용자 매치 기록</h1>
+    <div id="matchRecords">
+        <% if (user && user.gameStartTimestamp && user.gameStartTimestamp.length > 0) { %>
+            <% user.gameStartTimestamp.forEach((timestamp, index) => { %>
+                <div class="match">
+                    <h2>게임 <%= index + 1 %></h2>
+                    <p>게임 시작 시간: <%= timestamp %></p>
+                    <p>게임 모드: <%= user.gameMode[index] %></p>
+                    <p>챔피언: <%= user.championName[index] %></p>
+                    <p>킬/데스/어시스트: <%= user.kills[index] %> / <%= user.deaths[index] %> / <%= user.assists[index] %></p>
+                    <p>승리 여부: <%= user.win[index] ? '승리' : '패배' %></p>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <p>매치 기록을 불러올 수 없습니다.</p>
+        <% } %>
+    </div>
+</body>
+</html>

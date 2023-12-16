@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dogguk 회원가입</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: linear-gradient(to right, #6dd5ed, #2193b0);
+        }
+        .login-container {
+            background: #fff;
+            padding: 40px;
+            width: 100%;
+            max-width: 350px;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            font-family: 'Noto Sans KR', sans-serif;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .input-space input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .input-space input:focus {
+            border-color: #2193b0;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 10px;
+            border: none;
+            background: #2193b0;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #6dd5ed;
+        }
+
+        p {
+            text-align: center;
+            color: #666;
+        }
+
+        .captcha-text {
+            margin-top: 20px;
+            color: #888;
+            font-size: 0.8rem;
+        }
+
+        @media (min-width: 768px) {
+            .login-container { max-width: 400px; }
+            h1 { font-size: 2.5rem; }
+            .input-space input { margin-bottom: 20px; }
+            button { padding: 20px; }
+        }
+        .input-space li {
+            list-style: none;
+            font-size: 0.9rem;
+            margin-top: -15px; 
+            margin-bottom: 10px; 
+            display: none; 
+            width: 100%; 
+            box-sizing: border-box;
+            text-align: left; 
+        }
+
+        .error {
+        color: #dc3545; 
+    }
+
+    .valid {
+        color: #28a745; 
+    }
+
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <h1>회원가입</h1>
+        <form action="/signup" method="post"> <!-- 예시 URL -->
+            <div class="input-space">
+                <input id = 'id' name="id" type="text" placeholder="아이디" autocomplete="username" required>
+                <li id = 'result'></li>
+                <input id="password" name="password" type="password" placeholder="비밀번호" autocomplete="new-password" required>
+                <input id = 'LOLname' name="LOLname" type="text" placeholder="롤아이디" autocomplete="off" required>
+                <li id = 'result2'></li>
+            </div>
+         
+                <button type="submit">회원가입</button>
+        </form>
+         
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function (event) {
+                event.preventDefault(); 
+        
+                const id = document.getElementById('id').value;
+                const password = document.getElementById('password').value;
+                const LOLname = document.getElementById('LOLname').value;
+        
+                // JSON 객체 생성
+                const data = {
+                    id: id,
+                    password: password,
+                    LOLname: LOLname
+                };
+        
+                fetch('/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json', 
+                    },
+                    body: JSON.stringify(data) 
+                })
+                .then(response => response.json().then(data => ({ status: response.status, body: data })))
+                .then(({ status, body }) => {
+                    if (status === 200) {
+                        alert('회원가입 성공!');
+                        window.location.href = '/'; 
+                    } else {
+                        throw new Error(body.message || '알 수 없는 오류가 발생했습니다.');
+                    }
+                })
+                .catch(error => {
+                    alert(error.message);
+                });
+            });
+        });
+
+
+        const id = document.querySelector('#id');
+        const result = document.querySelector('#result');
+        const LOLname = document.querySelector('#LOLname');
+        const result2 = document.querySelector('#result2');
+        let serverId;
+        let serverLOLname;
+        let initialCheckDone = false;
+        let initialCheckDone2 = false;
+        
+        async function checkIdOverlap(){    
+            try{
+                const response = await fetch('/getinfo', {
+                    method : 'POST',
+                    headers: {
+                        'Content-Type' : 'application/json'
+                    },
+                    body:JSON.stringify({id : id.value, LOLname : LOLname.value})
+                });
+                const data = await response.json();
+                console.log(data.message);
+                return data;
+                
+            }catch(err){
+                throw err;
+            }
+        }
+    
+        id.onblur = async function(e){
+            let err = await checkIdOverlap();
+            console.log(err);
+            if(err.message == '중복된 아이디입니다.'){
+                result.innerHTML = "중복된 id";
+                result.className = 'error';
+                result.style.display = 'block';
+            }
+            else if(err.message == '입력값이 없습니다.'){
+                result.innerHTML = "아이디를 입력하시오";
+                result.className = 'error';
+                result.style.display = 'block';
+            }
+            else{
+                result.innerHTML = '사용가능 id';
+                result.className = 'valid';
+                result.style.display = 'block';
+            }
+        }
+    
+    
+        LOLname.onblur = async function(e){
+            let err = await checkIdOverlap();
+            console.log(err);
+
+            if(err.message == '중복된 닉네임입니다.'){
+                result2.innerHTML = "중복된 닉네임";
+                result2.className = 'error';
+                result2.style.display = 'block'
+            }
+    
+            else if(err.message == '입력값이 없습니다.'){
+                result2.innerHTML = '닉네임을 입력하시오';
+                result2.className = 'valid'; 
+                result2.style.display = 'block';
+            }
+            else{
+                result2.innerHTML = '중복되지 않습니다.';
+                result2.className = 'valid'; 
+                result2.style.display = 'block';
+            }
+        }
+        </script>
+  
+</body>
+</html>

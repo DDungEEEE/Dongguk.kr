@@ -1,0 +1,230 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>쪽지 보내기</title>
+    <style>
+           html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Noto Sans KR', Arial, sans-serif;
+            background-color: #e9ecef;
+            max-width: 100%;
+    overflow-x: hidden; /* 가로 스크롤 방지 */
+        }
+
+        header {
+            background-color: #343a40;
+            color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            height: 45px;
+            margin-left: -20px; /* 여백 제거 */
+            margin-right: -20px; /* 여백 제거 */
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: flex-start; 
+            align-items: center;
+            padding: 0 1rem;
+            margin: 0;
+        }
+
+
+        nav li:not(:last-child) {
+            margin-right: 10px;
+        }
+
+        .user-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: auto; 
+        }
+
+        nav button, .search-container button {
+            background-color: #007bff;
+            border: none;
+            padding: 0.5rem 1rem;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        nav button:hover, .search-container button:hover {
+            background-color: #0056b3;
+        }
+
+        .search-container {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-container input[type="text"] {
+            padding: 8px;
+            font-size: 16px;
+            border: 2px solid #007bff;
+            border-radius: 5px;
+            width: 300px;
+        }
+
+
+        @media (max-width: 768px) {
+            .search-container, .user-controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .search-container input[type="text"],
+            .search-container button {
+                width: 100%;
+            }
+
+            nav ul {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+        #messageForm {
+    margin-top: 60px; 
+    padding: 30px;
+    background: #ffffff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    max-width: 650px;
+    margin: 60px auto; 
+}
+
+
+#messageForm label {
+    display: block;
+    margin-bottom: 5px; 
+    font-weight: bold;
+}
+
+#messageForm input[type="text"],
+#messageForm textarea {
+    width: 90%; 
+    max-width: 100%; 
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    border: 2px solid #ddd;
+}
+
+#messageForm textarea {
+    height: 150px; 
+}
+
+#messageForm button {
+    width: 25%;
+    padding: 10px;
+    background-color: #28a745; 
+    color: white;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+}
+
+#messageForm button:hover {
+    background-color: #218838; 
+}
+.message-box {
+    background-color: #f8d7da; 
+    color: #721c24;
+    padding: 10px;
+    margin: 20px 0;
+    border-radius: 5px;
+    text-align: center;
+    border: 1px solid #f5c6cb;
+}
+    </style>
+</head>
+<body>
+     <header>
+        <nav>
+            <ul>
+                <li><a href='/home'><button id="boardBtn">홈</button></a></li>
+                <li><a href='/list'><button id="boardBtn">게시판</button></a></li>
+                <li><a href='/chat'><button id="boardBtn">채팅방</button></a></li>
+                <li><a href='/getMessageList'><button id="boardBtn">쪽지함</button></a></li>
+                <!-- 검색 컨테이너 -->
+                <li class="search-container">
+                    <form action = /getMatchRecord method = 'post'>
+                        <input type="text" name="lolname" id="searchInput" class="search-input" placeholder="소환사명, 소환사명...">
+                        <button id="searchBtn" class="search-button"sjrk >검색</button>
+                        </form>
+                </li>
+                
+                <!-- 사용자 컨트롤 -->
+                <li class="user-controls">
+                    <span id="userGreeting"><%= userInfo%> 님 환영합니다.</span>
+                    <form action='/logout' method='get'>
+                        <button id="logoutBtn">로그아웃</button>
+                    </form>
+                </li>
+            </ul>
+        </nav>
+    </header>
+    <form id="messageForm">
+        <label for="sendUser">보내는 사람:<%=userId%></label>
+        <input type="text" id="sendUser" name="sendUser" value="<%=userId%>" style="display:none;" required><br><br>
+
+        <label for="getUser">받는 사람:</label>
+        <input type="text" id="getUser" name="getUser" required><br><br>
+
+        <label for="content">내용:</label>
+        <textarea id="content" name="content" required></textarea><br><br>
+
+        <button type="submit">쪽지 만들기</button>
+    </form>
+
+    
+    <script>
+    document.getElementById('messageForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    var formData = {
+        sendUser: document.getElementById('sendUser').value,
+        getUser: document.getElementById('getUser').value,
+        content: document.getElementById('content').value
+    };
+    fetch('/sendMessage', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => {
+        if (response.status === 200) {
+            alert('메세지 전송 성공');
+            window.location.href = '/getMessageList'; // 200 상태 코드일 경우 페이지 이동
+        } else {
+            return response.json(); // 다른 상태 코드일 경우 메시지 처리
+        }
+    })
+    .then(data => {
+        if (data) {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('오류가 발생했습니다.');
+    });
+});
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= post.title %></title>
+    <style>
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        font-family: 'Noto Sans KR', Arial, sans-serif;
+        background-color: #e9ecef;
+    }
+
+    header {
+        background-color: #343a40;
+        color: #ffffff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        padding: 1rem;
+        position: fixed;
+        width: 100%;
+        top: 0;
+        z-index: 1000;
+        height: 40px;
+        margin-left: -20px; /* 여백 제거 */
+        margin-right: -20px; /* 여백 제거 */
+    }
+
+    nav ul {
+        list-style: none;
+        display: flex;
+        justify-content: flex-start; 
+        align-items: center;
+        padding: 0 1rem;
+        margin: 0;
+    }
+
+
+    nav li:not(:last-child) {
+        margin-right: 10px;
+    }
+
+    .user-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-left: auto; 
+    }
+
+    nav button, .search-container button {
+        background-color: #007bff;
+        border: none;
+        padding: 0.5rem 1rem;
+        color: white;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+    }
+
+    nav button:hover, .search-container button:hover {
+        background-color: #0056b3;
+    }
+
+    .search-container {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .search-container input[type="text"] {
+        padding: 8px;
+        font-size: 16px;
+        border: 2px solid #007bff;
+        border-radius: 5px;
+        width: 300px;
+    }
+    .container {
+            width: 80%;
+            max-width: 800px;
+            margin: 0 auto;
+            margin-top: 20px;
+        }
+
+        .post-details {
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .post-details h1 {
+            margin: 0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .post-meta {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        .post-content p {
+            line-height: 1.6;
+        }
+        .post-actions {
+        text-align: right;
+        margin-top: 20px;
+    }
+
+    .post-actions button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.2s;
+        margin-left: 10px;
+    }
+
+    .post-actions .edit-button {
+        background-color: #28a745; 
+    }
+
+    .post-actions .delete-button {
+        background-color: #dc3545; 
+    }
+
+    .post-actions button:hover {
+        opacity: 0.9;
+        transform: scale(1.05); 
+    }
+
+    @media (max-width: 768px) {
+        .search-container, .user-controls {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .search-container input[type="text"],
+        .search-container button {
+            width: 100%;
+        }
+
+        nav ul {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+    }
+</style>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href='/home'><button id="boardBtn">홈</button></a></li>
+                <li><a href='/list'><button id="boardBtn">게시판</button></a></li>
+                <li><a href='/chat'><button id="boardBtn">채팅방</button></a></li>
+                <li><a href='/getMessageList'><button id="boardBtn">쪽지함</button></a></li>
+                <!-- 검색 컨테이너 -->
+                <li class="search-container">
+                    <form action = /getMatchRecord method = 'post'>
+                        <input type="text" name="lolname" id="searchInput" class="search-input" placeholder="소환사명, 소환사명...">
+                        <button id="searchBtn" class="search-button"sjrk >검색</button>
+                        </form>
+                </li>
+                
+                <!-- 사용자 컨트롤 -->
+                <li class="user-controls">
+                    <span id="userGreeting"><%= userInfo%> 님 환영합니다.</span>
+                    <form action='/logout' method='get'>
+                        <button id="logoutBtn">로그아웃</button>
+                    </form>
+                </li>
+            </ul>
+        </nav>
+    </header>
+    <div class="container" style="padding-top: 60px;">
+        <div class="post-details" data-post-id="<%= post._id %>" data-is-user="<%= isUser %>">
+            <h1><%= post.title %></h1>
+            <div class="post-meta">
+                <span class="writer">작성자: <%= post.writer %></span>
+                <span class="date">작성일: <%= post.date %></span>
+            </div>
+            <div class="post-content">
+                <p><%= post.content %></p>
+            </div>
+            <div class="post-actions">
+                <% if (isUser) { %>
+                    <button onclick="editPost('<%= post._id %>')" class="edit-button">수정하기</button>
+                    <button onclick="deletePost('<%= post._id %>')" class="delete-button">삭제하기</button>
+                <% } %>
+            </div>
+        </div>
+    </div>
+    <script>
+     document.addEventListener('DOMContentLoaded', function() {
+        const postDetails = document.querySelector('.post-details');
+        const postId = postDetails.getAttribute('data-post-id');
+        const isUser = postDetails.getAttribute('data-is-user') === 'true';
+        if (isUser) {
+            const editButton = document.querySelector('.edit-button');
+            const deleteButton = document.querySelector('.delete-button');
+            if (editButton) {
+                editButton.addEventListener('click', function() {
+                    window.location.href = `/edit/${postId}`;
+                });
+            }
+            if (deleteButton) {
+                deleteButton.addEventListener('click', function() {
+                    if (confirm("정말로 이 게시글을 삭제하시겠습니까?")) {
+                        fetch(`/delete/${postId}`, { method: 'POST' })
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error('삭제 실패');
+                                }
+                                return response.json();
+                            })
+                            .then(data => {
+                                alert("게시글이 삭제되었습니다.");
+                                window.location.href = '/list';
+                            })
+                            .catch(error => console.error('Error:', error));
+                    }
+                });
+            }
+        } else {
+            const editButton = document.querySelector('.edit-button');
+            const deleteButton = document.querySelector('.delete-button');
+            if (editButton) editButton.disabled = true;
+            if (deleteButton) deleteButton.disabled = true;
+        }
+    });
+    </script>
+</body>
+</html>

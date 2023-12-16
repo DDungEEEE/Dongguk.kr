@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>채팅방</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <style>
+       html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Noto Sans KR', Arial, sans-serif;
+            background-color: #e9ecef;
+        }
+        header {
+    background-color: #343a40;
+    color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 1rem 0;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+    height: 70px;
+    box-sizing: border-box; 
+}
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: flex-start; 
+            align-items: center;
+            padding: 0 1rem;
+            margin: 0;
+        }
+
+
+        nav li:not(:last-child) {
+            margin-right: 10px;
+        }
+
+        .user-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: auto; 
+        }
+
+        nav button, .search-container button {
+            background-color: #007bff;
+            border: none;
+            padding: 0.5rem 1rem;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        nav button:hover, .search-container button:hover {
+            background-color: #0056b3;
+        }
+
+        .search-container {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-container input[type="text"] {
+            padding: 8px;
+            font-size: 16px;
+            border: 2px solid #007bff;
+            border-radius: 5px;
+            width: 300px;
+        }
+
+
+        @media (max-width: 768px) {
+            .search-container, .user-controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .search-container input[type="text"],
+            .search-container button {
+                width: 100%;
+            }
+
+            nav ul {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+        body {
+    padding-top: 70px;
+}
+
+
+body {
+    background-color: #f0f0f0;
+    font-family: 'Arial', sans-serif;
+
+}
+    .container {
+      max-width: 600px;
+      margin: 50px auto;
+      background-color: #FFF;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h3 {
+      margin-bottom: 20px;
+    }
+
+    #chatContainer {
+      height: 400px;
+      overflow-y: auto;
+      background-color: white;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 10px;
+    }
+
+    .myChat, .otherChat {
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+
+    .myChat strong, .otherChat strong {
+      padding: 8px 12px;
+      border-radius: 15px;
+      display: inline-block;
+    }
+
+    .myChat {
+      text-align: left; 
+      color: black;
+    }
+
+    .myChat strong {
+      background-color: #a0e1e0;
+    }
+
+    .otherChat {
+      text-align: right;
+      color: black;
+    }
+
+
+    .otherChat strong {
+      background-color: #f1f0f0;
+    }
+
+    form {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    #msgForm {
+      width: 80%;
+      margin-right: 10px;
+    }
+
+    .btn {
+      background-color: #4CAF50;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 4px 2px;
+      transition-duration: 0.4s;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .btn:hover {
+      background-color: #45a049;
+    }
+
+    #logoutButton {
+      width: 100%;
+      margin-top: 10px;
+    }
+    .search-container input[type="text"] {
+    padding: 8px;
+    font-size: 16px;
+    border: 2px solid #007bff;
+    border-radius: 5px;
+    width: 300px;
+    color: #000; 
+}
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+        <ul>
+            <li><a href='/home'><button id="boardBtn">홈</button></a></li>
+            <li><a href='/list'><button id="boardBtn">게시판</button></a></li>
+            <li><a href='/chat'><button id="boardBtn">채팅방</button></a></li>
+            <li><a href='/getMessageList'><button id="boardBtn">쪽지함</button></a></li>
+            <!-- 검색 컨테이너 -->
+            <li class="search-container">
+              <form action = /getMatchRecord method = 'post'>
+                  <input type="text" name="lolname" id="searchInput" class="search-input" placeholder="소환사명, 소환사명...">
+                  <button id="searchBtn"  >검색</button>
+          </form>
+          </li>
+
+            <li class="user-controls">
+                <span id="userGreeting"><%= userId%> 님 환영합니다.</span>
+                <form action='/logout' method='get'>
+                    <button id="logoutButton">로그아웃</button>
+                </form>
+            </li>
+        </ul>
+    </nav>
+</header>
+ <div class="container">
+    <h3 style="text-align:center;">채팅방</h3>
+    <div id="chatContainer">
+      <div id="chatLogs"></div>
+    </div>
+    <form class="form-inline">
+      <div class="form-group" style="width: 100%;">
+        <div style="display: flex;">
+          <input type="text" class="form-control" id="msgForm" style="width: 85%;">
+          <button type="submit" class="btn btn-primary" style="width: 14%; margin-left: 5px;">Send</button>
+        </div>
+      </div>
+    </form>
+</div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+   
+  
+  $(function(){
+    // socket.io 서버에 접속한다
+    var socket = io();
+
+    // 서버로 자신의 정보를 전송한다.
+    socket.emit("login", {
+      LOLname: '<%= LOLname %>',
+      userId: '<%= userId %>',
+    });
+    
+    socket.on("login", function(data) {
+      if((typeof data) == 'string'){
+        console.log(data);
+        $("#chatLogs").append("<div><strong>" + data + "</strong></div>");
+      }else{
+        console.log(typeof data);
+      }
+
+    if(data.msg != undefined){
+      console.log(data, '<%= LOLname %>');
+      var chatClass = (data.from.LOLname == '<%= LOLname %>') ? 'myChat' : 'otherChat';
+      $("#chatLogs").append("<div class='" +chatClass + "' > <strong>" + data.from.LOLname + " </strong>:  " + data.msg + "</div>");
+      // 스크롤을 항상 맨 아래로 유지
+      $("#chatContainer").scrollTop($("#chatContainer")[0].scrollHeight);
+    }
+    });
+ 
+
+    socket.on("chat", function(data) {
+      if(data.msg.trim() == ''){
+        alert('문자를 입력해주세요.');
+      }
+      else{
+        var chatClass = (data.from.LOLname === '<%= LOLname %>') ? 'myChat' : 'otherChat';
+        $("#chatLogs").append("<div class='" +chatClass + "' > <strong>" + data.from.LOLname + " </strong>:  " + data.msg + "</div>");
+        // 스크롤을 항상 맨 아래로 유지
+        $("#chatContainer").scrollTop($("#chatContainer")[0].scrollHeight);
+      }
+    });
+
+    // Send 버튼이 클릭되면
+    $(".form-inline").submit(function(e) {
+        e.preventDefault();
+      var $msgForm = $("#msgForm");
+
+      // 서버로 메시지를 전송한다.
+      if ($msgForm.val().trim() === '') {
+        alert('문자를 입력해주세요.');
+      } else {
+        socket.emit("chat", { msg: $msgForm.val() });
+        $msgForm.val("");
+      }
+
+    
+    });
+    
+    $("#logoutButton").click(function() {
+        // 서버에 로그아웃 요청을 보냅니다.
+        socket.emit("logout");
+    });
+    socket.on("logout", function() {
+        // 대화창을 지웁니다.
+        $("#chatLogs").empty();
+    });
+    socket.on()
+    
+  });
+
+  </script>
+</body>
+</html>

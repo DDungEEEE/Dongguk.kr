@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>메인 페이지</title>
+    <style>
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'Noto Sans KR', Arial, sans-serif;
+    background-color: #e9ecef;
+}
+
+
+header {
+    background-color: #343a40;
+    color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 1rem;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0 1rem;
+    margin: 0;
+}
+
+
+nav li:not(:last-child) {
+    margin-right: 10px;
+}
+
+
+.user-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto; 
+}
+
+nav button, .search-container button {
+    background-color: #007bff;
+    border: none;
+    padding: 0.5rem 1rem;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+nav button:hover, .search-container button:hover {
+    background-color: #0056b3;
+}
+
+.search-container {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.search-container input[type="text"] {
+    padding: 8px;
+    font-size: 16px;
+    border: 2px solid #007bff;
+    border-radius: 5px;
+    width: 300px;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-top: 60px;
+    min-height: calc(100% - 60px);
+}
+
+#rankSection {
+    position: absolute;
+    top: 100px;
+    left: 50px;
+    width: 100%;
+    max-width: 1450px;
+    margin: 2rem auto;
+    background-color: #ffffff;
+    padding: 1rem;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+
+#rankTable {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+#rankTable thead {
+    background-color: blanchedalmond;
+    color: black;
+}
+
+#rankTable th, #rankTable td {
+    padding: 0.75rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+#rankTable tbody tr:hover {
+    background-color: #f2f2f2;
+}
+
+#rankTable tbody tr:nth-child(odd) {
+    background-color: #f9f9f9;
+}
+
+#rankTable th {
+    position: sticky;
+    top: 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+
+.top-right-box {
+    position: fixed;
+    top: 130px;
+    right: 20px; 
+    width: 300px; 
+    max-height: 500px; 
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    z-index: 999;
+    padding: 10px;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+#summonerIcon {
+    width: 100px; 
+    height: auto; 
+    display: inline-block; 
+    vertical-align: middle; 
+}
+
+
+.user-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+
+@media (max-width: 768px) {
+    .search-container, .user-controls {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .search-container input[type="text"],
+    .search-container button {
+        width: 100%;
+    }
+
+    nav ul {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    #rankSection {
+        position: relative;
+        top: 0;
+        left: 0;
+        width: auto;
+        margin-top: 70px;
+        margin-left: 0;
+    }
+
+    main {
+        padding-top: 0;
+    }
+
+    .top-right-box {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100%;
+        height: auto;
+    }
+}
+    </style>
+</head>
+<body>
+    <!-- 헤더 시작 -->
+    <header>
+        <nav>
+            <ul>
+                <li><a href='/home'><button id="boardBtn">홈</button></a></li>
+                <li><a href='/list'><button id="boardBtn">게시판</button></a></li>
+                <li><a href='/chat'><button id="boardBtn">채팅방</button></a></li>
+                <li><a href='/getMessageList'><button id="boardBtn">쪽지함</button></a></li>
+                <!-- 검색 컨테이너 -->
+                <li class="search-container">
+                    <form action = /getMatchRecord method = 'post'>
+                        <input type="text" name="lolname" id="searchInput" class="search-input" placeholder="소환사명, 소환사명...">
+                        <button id="searchBtn" class="search-button"sjrk >검색</button>
+                        </form>
+                </li>
+                
+                <!-- 사용자 컨트롤 -->
+                <li class="user-controls">
+                    <span id="userGreeting"><%= userInfo%> 님 환영합니다.</span>
+                    <form action='/logout' method='get'>
+                        <button id="logoutBtn">로그아웃</button>
+                    </form>
+                </li>
+            </ul>
+        </nav>
+    </header>
+    
+    
+    <!-- 상단 우측 박스 -->
+    <div class="top-right-box">
+        <div id="userProfile">
+            <h1>내 정보</h1>
+            <img id="summonerIcon" src="" alt="Summoner Icon">
+            <div id="summonerInfo">
+                <h3 id="summonerName">Summoner Name</h3>
+                <p id="summonerTier">Tier</p>
+                <p id="summonerWins">Wins</p>
+                <p id="summonerLosses">Losses</p>
+                <p id="summonerWinRate">Win Rate</p>
+            </div>
+        </div>
+    </div>
+    <!-- 메인 컨텐츠 시작 -->
+    <main>
+        <!-- 랭킹 섹션 -->
+        <section id="rankSection">
+            <table id="rankTable">
+                <!-- 테이블 헤더 -->
+                <thead>
+                    <tr>
+                        <th>순위</th>
+                        <th>소환사</th>
+                        <th>티어</th>
+                        <th>승</th>
+                        <th>패</th>
+                        <th>승률</th>
+                    </tr>
+                </thead>
+                <!-- 테이블 바디 -->
+                <tbody>
+                    <!-- 데이터 삽입 위치 -->
+                </tbody>
+            </table>
+        </section>
+    </main>
+    <!-- 페이지 로드 시 데이터 가져오기 -->
+    <script>
+     document.addEventListener('DOMContentLoaded', function() {
+        // ...
+    
+        // 검색 버튼 클릭 이벤트 처리
+        const searchBtn = document.getElementById('searchBtn');
+        const searchInput = document.getElementById('searchInput');
+    
+        searchBtn.addEventListener('click', function() {
+            const summonerName = searchInput.value; // 검색어 가져오기
+    
+            // 검색어를 백엔드로 전달
+            fetch('/searchSummoner', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ summonerName }), // JSON 형태로 검색어 전달
+            })
+            .then(response => response.json())
+            .catch(error => console.error('Error:', error));
+        });
+      });
+      document.addEventListener('DOMContentLoaded', function() {
+        
+        fetch('/getUserDetail', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+           
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.length > 0) {
+                const summoner = data[0];
+
+               
+                document.getElementById('summonerName').innerText =`롤 닉네임: ${summoner.LOLname}`;
+                document.getElementById('summonerTier').innerText =`롤 티어: ${summoner.Tier}`;
+                document.getElementById('summonerWins').innerText = `Wins: ${summoner.Wins}`;
+                document.getElementById('summonerLosses').innerText = `Losses: ${summoner.Losses}`;
+                document.getElementById('summonerWinRate').innerText = `Win Rate: ${summoner.WinRate}%`;
+                if(summoner.userIcon) {
+                    document.getElementById('summonerIcon').src = summoner.userIcon; // 아이콘 URL 설정
+                }
+            }
+        })
+        .catch(error => console.error('Error:', error));
+
+
+       
+        fetch('/get-lol-data')
+        .then(response => response.json())
+        .then(data => {
+            const rankTableBody = document.getElementById('rankTable').querySelector('tbody');
+            data.forEach((summoner, index) => {
+                const row = rankTableBody.insertRow();
+                row.insertCell(0).innerText = index + 1;
+                row.insertCell(1).innerText = summoner.LoLname;
+                row.insertCell(2).innerText = summoner.Tier;
+                row.insertCell(3).innerText = summoner.Wins;
+                row.insertCell(4).innerText = summoner.Losses;
+                row.insertCell(5).innerText = `${summoner.WinRate}%`;
+            });
+        })
+        .catch(error => console.error('Error:', error));
+        
+        
+    });
+       
+    </script>
+</body>
